@@ -1,0 +1,30 @@
+{
+  "name": "gearloop-server",
+  "version": "1.0.0",
+  "description": "GearLoop Express backend — marketplace data API",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch -r dotenv/config src/server.ts",
+    "build": "tsc",
+    "start": "node -r dotenv/config dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.0",
+    "helmet": "^8.3.0",
+    "mongodb": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  }
+}
