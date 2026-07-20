@@ -127,7 +127,7 @@ const listings: ListingSeed[] = [
     pricePerDay: 25,
     location: "San Diego, CA",
     images: [
-      "https://images.unsplash.com/photo-1544551763-779a20e9e28c?w=800&q=80",
+      "https://images.unsplash.com/photo-1530053969600-caed2596d242?w=800&q=80",
       "https://images.unsplash.com/photo-1509914398892-963f53e6e2f1?w=800&q=80",
     ],
     condition: "excellent",
@@ -157,7 +157,7 @@ const listings: ListingSeed[] = [
     pricePerDay: 30,
     location: "Miami, FL",
     images: [
-      "https://images.unsplash.com/photo-1559827291-bce2640df936?w=800&q=80",
+      "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=800&q=80",
       "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=800&q=80",
     ],
     condition: "excellent",
@@ -219,7 +219,7 @@ const listings: ListingSeed[] = [
     pricePerDay: 25,
     location: "Bend, OR",
     images: [
-      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80",
+      "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=80",
       "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=800&q=80",
     ],
     condition: "good",
