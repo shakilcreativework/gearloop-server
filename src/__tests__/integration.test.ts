@@ -2,16 +2,17 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vites
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient, Db, ObjectId } from "mongodb";
 import request from "supertest";
+import type { Express } from "express";
 
 // Mock db module BEFORE anything imports it — prevents the MONGODB_DB_NAME throw
-vi.mock("../config/db", () => ({
+vi.mock("../config/db.js", () => ({
   connectToDatabase: vi.fn(),
   getDb: vi.fn(),
   getClient: vi.fn(),
 }));
 
 // Mock protectRoute: accept "Bearer mock-session-token", reject everything else
-vi.mock("../middleware/protectRoute", () => ({
+vi.mock("../middleware/protectRoute.js", () => ({
   protectRoute: (req: any, res: any, next: any) => {
     const auth = req.headers?.authorization;
     if (auth === "Bearer mock-session-token") {
@@ -27,14 +28,14 @@ vi.mock("../middleware/protectRoute", () => ({
 }));
 
 // Mock protectInternalRoute to always pass
-vi.mock("../middleware/protectInternalRoute", () => ({
+vi.mock("../middleware/protectInternalRoute.js", () => ({
   protectInternalRoute: (_req: any, _res: any, next: any) => next(),
 }));
 
 let mongod: MongoMemoryServer;
 let client: MongoClient;
 let db: Db;
-let app: typeof import("../app").default;
+let app: Express;
 
 beforeAll(async () => {
   process.env.NODE_ENV = "test";
@@ -45,12 +46,12 @@ beforeAll(async () => {
   db = client.db("test");
 
   // Override the mocked db module so every controller reads from our in-memory DB
-  const dbMod = await import("../config/db");
+  const dbMod = await import("../config/db.js");
   (dbMod.getDb as any).mockReturnValue(db);
   (dbMod.getClient as any).mockReturnValue(client);
 
   // Import app after db override — controllers now use the in-memory DB
-  app = (await import("../app")).default;
+  app = (await import("../app.js")).default as unknown as Express;
 });
 
 afterAll(async () => {
