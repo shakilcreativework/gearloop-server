@@ -45,7 +45,7 @@ beforeAll(async () => {
   await client.connect();
   db = client.db("test");
 
-  // Override the mocked db module so every controller reads from our in-memory DB
+  // Override the mocked db module so every controller reads from our in-memory DB.
   const dbMod = await import("../config/db.js");
   (dbMod.getDb as any).mockReturnValue(db);
   (dbMod.getClient as any).mockReturnValue(client);
