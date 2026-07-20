@@ -40,11 +40,11 @@ export async function getListings(req: Request, res: Response, next: NextFunctio
       filter.rating = { $gte: parseFloat(minRating) };
     }
 
-    let sortOption: Record<string, 1 | -1> = { createdAt: -1 };
-    if (sort === "price-asc") sortOption = { pricePerDay: 1 };
-    else if (sort === "price-desc") sortOption = { pricePerDay: -1 };
-    else if (sort === "rating") sortOption = { rating: -1 };
-    else if (sort === "newest") sortOption = { createdAt: -1 };
+    let sortOption: Record<string, 1 | -1> = { createdAt: -1, _id: -1 };
+    if (sort === "price-asc") sortOption = { pricePerDay: 1, _id: 1 };
+    else if (sort === "price-desc") sortOption = { pricePerDay: -1, _id: -1 };
+    else if (sort === "rating") sortOption = { rating: -1, _id: -1 };
+    else if (sort === "newest") sortOption = { createdAt: -1, _id: -1 };
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 20));
