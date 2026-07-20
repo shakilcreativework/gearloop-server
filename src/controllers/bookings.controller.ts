@@ -100,3 +100,53 @@ export async function getBookingsByRenter(
     next(err);
   }
 }
+
+export async function updateBookingStatus(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const db = getDb();
+    const bookings = db.collection<BookingDoc>("bookings");
+
+    const id = getParam(req, "id");
+
+    if (!ObjectId.isValid(id)) {
+      res.status(400).json({
+        error: { message: "Invalid booking ID", code: "VALIDATION_ERROR" },
+      });
+      return;
+    }
+
+    const existing = await bookings.findOne({ _id: new ObjectId(id) });
+
+    if (!existing) {
+      res.status(404).json({
+        error: { message: "Booking not found", code: "NOT_FOUND" },
+      });
+      return;
+    }
+
+    const updates: Record<string, unknown> = {};
+    if (req.body.paymentStatus !== undefined) updates.paymentStatus = req.body.paymentStatus;
+    if (req.body.status !== undefined) updates.status = req.body.status;
+
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({
+        error: { message: "No valid fields to update", code: "VALIDATION_ERROR" },
+      });
+      return;
+    }
+
+    const result = await bookings.findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: updates },
+      { returnDocument: "after" }
+    );
+
+    res.json({ booking: result });
+  } catch (err) {
+    next(err);
+  }
+}

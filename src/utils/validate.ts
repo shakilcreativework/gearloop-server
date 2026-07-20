@@ -228,6 +228,49 @@ export function validateBookingBody(req: Request, res: Response, next: NextFunct
   next();
 }
 
+export function validateBookingUpdateBody(req: Request, res: Response, next: NextFunction): void {
+  if (!isPlainObject(req.body)) {
+    res.status(400).json({
+      error: { message: "Request body must be a JSON object", code: "VALIDATION_ERROR" },
+    });
+    return;
+  }
+
+  const body = req.body as Record<string, unknown>;
+  const errors: ValidationError[] = [];
+
+  const allowedFields = ["paymentStatus", "status"];
+
+  errors.push(...rejectUnknownFields(body, allowedFields));
+
+  if (body.paymentStatus !== undefined) {
+    if (!VALID_PAYMENT_STATUSES.includes(body.paymentStatus as typeof VALID_PAYMENT_STATUSES[number])) {
+      errors.push({
+        field: "paymentStatus",
+        message: `Payment status must be one of: ${VALID_PAYMENT_STATUSES.join(", ")}`,
+      });
+    }
+  }
+
+  if (body.status !== undefined) {
+    if (!VALID_BOOKING_STATUSES.includes(body.status as typeof VALID_BOOKING_STATUSES[number])) {
+      errors.push({
+        field: "status",
+        message: `Status must be one of: ${VALID_BOOKING_STATUSES.join(", ")}`,
+      });
+    }
+  }
+
+  if (errors.length > 0) {
+    res.status(400).json({
+      error: { message: "Validation failed", code: "VALIDATION_ERROR", details: errors },
+    });
+    return;
+  }
+
+  next();
+}
+
 export function validateReviewBody(req: Request, res: Response, next: NextFunction): void {
   if (!isPlainObject(req.body)) {
     res.status(400).json({
