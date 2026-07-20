@@ -50,7 +50,7 @@ beforeAll(async () => {
   (dbMod.getDb as any).mockReturnValue(db);
   (dbMod.getClient as any).mockReturnValue(client);
 
-  // Import app after db override — controllers now use the in-memory DB
+  // Import app after db override — controllers now use the in-memory DB.
   app = (await import("../app.js")).default as unknown as Express;
 });
 
