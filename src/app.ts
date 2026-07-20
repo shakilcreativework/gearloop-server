@@ -7,6 +7,7 @@ import listingsRouter from "./routes/listings.routes";
 import bookingsRouter from "./routes/bookings.routes";
 import reviewsRouter from "./routes/reviews.routes";
 import usersRouter from "./routes/users.routes";
+import adminRouter from "./routes/admin.routes";
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", listingsRouter);
 app.use("/api", reviewsRouter);
 app.use("/api", usersRouter);
+app.use("/api", adminRouter);
 
 // Protected write routes (with rate limiting)
 app.post("/api/listings", writeLimiter);
@@ -44,6 +46,8 @@ app.put("/api/listings/:id", writeLimiter);
 app.delete("/api/listings/:id", writeLimiter);
 app.post("/api/bookings", writeLimiter);
 app.post("/api/reviews", writeLimiter);
+app.delete("/api/admin/listings/:id", writeLimiter);
+app.delete("/api/admin/reviews/:id", writeLimiter);
 
 app.use("/api", bookingsRouter);
 

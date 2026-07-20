@@ -129,6 +129,7 @@ export async function protectRoute(
     (req as any).userId = u.id;
     (req as any).userEmail = u.email;
     (req as any).userName = u.name;
+    (req as any).userRole = typeof u.role === "string" ? u.role : "renter";
 
     next();
   } catch (err) {
