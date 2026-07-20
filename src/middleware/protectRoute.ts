@@ -2,22 +2,6 @@ import { Request, Response, NextFunction } from "express";
 
 const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || "http://localhost:3000";
 
-interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  image?: string;
-}
-
-interface AuthSessionResponse {
-  session: {
-    id: string;
-    userId: string;
-    expiresAt: string;
-  };
-  user: AuthUser;
-}
-
 export async function protectRoute(
   req: Request,
   res: Response,
@@ -58,9 +42,25 @@ export async function protectRoute(
       return;
     }
 
-    const data = (await response.json()) as AuthSessionResponse;
+    let data: unknown;
+    try {
+      data = await response.json();
+    } catch {
+      res.status(401).json({
+        error: {
+          message: "Invalid authentication response",
+          code: "UNAUTHORIZED",
+        },
+      });
+      return;
+    }
 
-    if (!data.session || !data.user) {
+    if (
+      data == null ||
+      typeof data !== "object" ||
+      !("session" in data) ||
+      !("user" in data)
+    ) {
       res.status(401).json({
         error: {
           message: "Invalid or expired session",
@@ -70,8 +70,42 @@ export async function protectRoute(
       return;
     }
 
-    // Check if session is expired
-    const expiresAt = new Date(data.session.expiresAt);
+    const rec = data as Record<string, unknown>;
+    const session = rec.session;
+    const user = rec.user;
+
+    if (
+      session == null ||
+      typeof session !== "object" ||
+      user == null ||
+      typeof user !== "object"
+    ) {
+      res.status(401).json({
+        error: {
+          message: "Invalid or expired session",
+          code: "UNAUTHORIZED",
+        },
+      });
+      return;
+    }
+
+    const s = session as Record<string, unknown>;
+    const u = user as Record<string, unknown>;
+
+    if (
+      typeof s.expiresAt !== "string" ||
+      isNaN(new Date(s.expiresAt).getTime())
+    ) {
+      res.status(401).json({
+        error: {
+          message: "Invalid or expired session",
+          code: "UNAUTHORIZED",
+        },
+      });
+      return;
+    }
+
+    const expiresAt = new Date(s.expiresAt);
     if (expiresAt.getTime() < Date.now()) {
       res.status(401).json({
         error: {
@@ -82,10 +116,19 @@ export async function protectRoute(
       return;
     }
 
-    // Attach user info for downstream controllers
-    (req as any).userId = data.user.id;
-    (req as any).userEmail = data.user.email;
-    (req as any).userName = data.user.name;
+    if (typeof u.id !== "string" || typeof u.email !== "string" || typeof u.name !== "string") {
+      res.status(401).json({
+        error: {
+          message: "Invalid or expired session",
+          code: "UNAUTHORIZED",
+        },
+      });
+      return;
+    }
+
+    (req as any).userId = u.id;
+    (req as any).userEmail = u.email;
+    (req as any).userName = u.name;
 
     next();
   } catch (err) {
